@@ -1,11 +1,11 @@
 package com.example.schedule_jpa.service;
 
-import com.example.schedule_jpa.dto.user.SaveUserRequestDto;
+
+import com.example.schedule_jpa.dto.user.SignupRequestDto;
 import com.example.schedule_jpa.dto.user.UpdateUserRequestDto;
 import com.example.schedule_jpa.dto.user.UserResponseDto;
 import com.example.schedule_jpa.entity.User;
 import com.example.schedule_jpa.repository.UserRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +18,8 @@ import java.util.NoSuchElementException;
 public class UserService {
     private final UserRepository userRepository;
 
-    public UserResponseDto saveUser(SaveUserRequestDto requestDto) {
-        User user = new User(requestDto.getUsername(), requestDto.getEmail());
+    public UserResponseDto saveUser(SignupRequestDto requestDto) {
+        User user = new User(requestDto.getUsername(), requestDto.getEmail(), requestDto.getPassword());
         User savedUser = userRepository.save(user);
         return new UserResponseDto(
                 savedUser.getId(),
