@@ -4,7 +4,7 @@ create table schedule
     id BIGINT auto_increment primary key comment '글 id',
     userid bigint not null comment '유저 고유 식별자',
     title varchar(255) not null comment '할 일 제목',
-    content varchar(255) not null comment '할 일 내용',
+    contents varchar(255) not null comment '할 일 내용',
     created_at timestamp not null comment '작성일',
     updated_at timestamp not null comment '수정일',
     foreign key (userid) references user (id)
