@@ -10,32 +10,42 @@ import org.hibernate.annotations.DynamicUpdate;
 @Table(name = "schedule")
 @Getter
 @DynamicUpdate
-public class Schedule extends BaseEntity{
+public class Schedule extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
     private String title;
+
     private String contents;
 
-    public Schedule(){}
+    @ManyToOne
+    @JoinColumn(name = "userid")
+    private User user;
 
-    public Schedule(String username, String title, String contents) {
-      this.username = username;
-      this.title = title;
-      this.contents = contents;
+    public Schedule() {
     }
 
-    public void updateContents(String contents){
-        this.contents = contents;
-    }
-    public void updateTitle(String title){
-        this.title = title;
-    }
-    public void update(String title, String contents){
+    public Schedule(String title, String contents) {
         this.title = title;
         this.contents = contents;
+    }
+
+    public void updateContents(String contents) {
+        this.contents = contents;
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void update(String title, String contents) {
+        this.title = title;
+        this.contents = contents;
+    }
+
+    public void setUser(User user){
+        this.user = user;
     }
 }
