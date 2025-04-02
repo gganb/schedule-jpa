@@ -1,19 +1,17 @@
 package com.example.schedule_jpa.service;
 
-import com.example.schedule_jpa.dto.ScheduleResponseDto;
-import com.example.schedule_jpa.dto.schedule.ScheduleSaveRequestDto;
-import com.example.schedule_jpa.dto.schedule.ScheduleSaveResponseDto;
-import com.example.schedule_jpa.dto.schedule.ScheduleUpdateRequestDto;
+import com.example.schedule_jpa.dto.schedule.response.ScheduleResponseDto;
+import com.example.schedule_jpa.dto.schedule.request.ScheduleSaveRequestDto;
+import com.example.schedule_jpa.dto.schedule.response.ScheduleSaveResponseDto;
 import com.example.schedule_jpa.entity.Schedule;
+import com.example.schedule_jpa.entity.User;
 import com.example.schedule_jpa.repository.ScheduleRepository;
+import com.example.schedule_jpa.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -21,27 +19,32 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
-    private final EntityManager em;
+    private final UserRepository userRepository;
 
+    // 일정 저장
     public ScheduleSaveResponseDto saveSchedule(ScheduleSaveRequestDto requestDto) {
+        User findUser = userRepository.findUserByUsernameOrElseThrow(requestDto.getUsername());
+
         Schedule schedule = new Schedule(
-                requestDto.getUsername(),
                 requestDto.getTitle(),
                 requestDto.getContents()
         );
+        schedule.setUser(findUser);
         Schedule savedSchedule = scheduleRepository.save(schedule);
+
         return new ScheduleSaveResponseDto(savedSchedule.getId(),
-                savedSchedule.getUsername(),
+                savedSchedule.getUser().getUsername(),
                 savedSchedule.getTitle(),
                 savedSchedule.getContents(),
                 savedSchedule.getCreatedAt());
     }
 
+    // id로 일정 단건 조회
     public ScheduleResponseDto findScheduleById(Long id) {
         Schedule findSchedule = scheduleRepository.findByIdOrElseThrow(id);
 
         return new ScheduleResponseDto(findSchedule.getId(),
-                findSchedule.getUsername(),
+                findSchedule.getUser().getUsername(),
                 findSchedule.getTitle(),
                 findSchedule.getContents(),
                 findSchedule.getCreatedAt(),
@@ -56,7 +59,7 @@ public class ScheduleService {
         }
         return scheduleList.stream().map(schedule -> new ScheduleResponseDto(
                 schedule.getId(),
-                schedule.getUsername(),
+                schedule.getUser().getUsername(),
                 schedule.getTitle(),
                 schedule.getContents(),
                 schedule.getCreatedAt(),
@@ -78,7 +81,7 @@ public class ScheduleService {
         }
 
         return new ScheduleResponseDto(findschedule.getId(),
-                findschedule.getUsername(),
+                findschedule.getUser().getUsername(),
                 findschedule.getTitle(),
                 findschedule.getContents(),
                 findschedule.getCreatedAt(),
@@ -90,5 +93,22 @@ public class ScheduleService {
         Schedule findSchedule = scheduleRepository.findByIdOrElseThrow(id);
         scheduleRepository.delete(findSchedule);
         return "[" + id + "] 글이 삭제되었습니다.";
+    }
+
+    @Transactional
+    public List<ScheduleResponseDto> findScheduleByUser(String username) {
+        User finduser = userRepository.findUserByUsernameOrElseThrow(username);
+        return scheduleRepository.findAll().stream()
+                .filter(s -> finduser.getUsername().equals(s.getUser().getUsername()))
+                .map(s -> new ScheduleResponseDto(
+                        s.getId(),
+                        s.getUser().getUsername(),
+                        s.getTitle(),
+                        s.getContents(),
+                        s.getCreatedAt(),
+                        s.getUpdatedAt()
+                )).toList();
+        // user가 가진 글 ??
+
     }
 }
