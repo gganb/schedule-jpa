@@ -1,6 +1,5 @@
-package com.example.schedule_jpa.dto;
+package com.example.schedule_jpa.dto.schedule.response;
 
-import com.example.schedule_jpa.entity.Schedule;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
