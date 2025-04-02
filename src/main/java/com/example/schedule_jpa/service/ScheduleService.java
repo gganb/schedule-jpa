@@ -9,11 +9,15 @@ import com.example.schedule_jpa.repository.ScheduleRepository;
 import com.example.schedule_jpa.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +55,7 @@ public class ScheduleService {
                 findSchedule.getCreatedAt());
     }
 
+    @Transactional(readOnly = true)
     public List<ScheduleResponseDto> findAll() {
 
         List<Schedule> scheduleList = scheduleRepository.findAll();
@@ -70,7 +75,6 @@ public class ScheduleService {
     @Transactional
     public ScheduleResponseDto updateSchedule(Long id, String title, String contents) {
         Schedule findschedule = scheduleRepository.findByIdOrElseThrow(id);
-
 
         if (title == null && contents != null) {
             findschedule.updateContents(contents);
@@ -95,20 +99,34 @@ public class ScheduleService {
         return "[" + id + "] 글이 삭제되었습니다.";
     }
 
-    @Transactional
-    public List<ScheduleResponseDto> findScheduleByUser(String username) {
-        User finduser = userRepository.findUserByUsernameOrElseThrow(username);
-        return scheduleRepository.findAll().stream()
-                .filter(s -> finduser.getUsername().equals(s.getUser().getUsername()))
-                .map(s -> new ScheduleResponseDto(
-                        s.getId(),
-                        s.getUser().getUsername(),
-                        s.getTitle(),
-                        s.getContents(),
-                        s.getCreatedAt(),
-                        s.getUpdatedAt()
+    @Transactional(readOnly = true)
+    public List<ScheduleResponseDto> findScheduleByUser(Long userid) {
+
+        List<Schedule> findList = scheduleRepository.findByUserIdOrderByUpdatedAtDesc(userid);
+        if(findList.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"작성자의 일정이 존재하지 않습니다.");
+        }
+        return findList.stream()
+                .map(schedule -> new ScheduleResponseDto(
+                        schedule.getId(),
+                        schedule.getUser().getUsername(),
+                        schedule.getTitle(),
+                        schedule.getContents(),
+                        schedule.getCreatedAt(),
+                        schedule.getUpdatedAt()
                 )).toList();
-        // user가 가진 글 ??
+//        return scheduleRepository.findAll().stream()
+//                .filter(s -> findUserName.equals(s.getUser().getUsername()))
+//                .map(s -> new ScheduleResponseDto(
+//                        s.getId(),
+//                        s.getUser().getUsername(),
+//                        s.getTitle(),
+//                        s.getContents(),
+//                        s.getCreatedAt(),
+//                        s.getUpdatedAt()
+//                )).toList();
+        // user가 가진
+
 
     }
 }
