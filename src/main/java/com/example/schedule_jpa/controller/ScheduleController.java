@@ -44,11 +44,11 @@ public class ScheduleController {
     }
 
     // 유저별 일정 조회 ...... 리스트
-    @GetMapping("/users/{username}")
+    @GetMapping("/users/{userid}")
     public ResponseEntity<List<ScheduleResponseDto>> findScheduleByUser(
-            @PathVariable String username
+            @PathVariable Long userid
     ) {
-        List<ScheduleResponseDto> findUserSchedule = scheduleService.findScheduleByUser(username);
+        List<ScheduleResponseDto> findUserSchedule = scheduleService.findScheduleByUser(userid);
         return new ResponseEntity<>(findUserSchedule, HttpStatus.OK);
     }
 
