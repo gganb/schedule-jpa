@@ -1,4 +1,4 @@
-package com.example.schedule_jpa.dto.schedule;
+package com.example.schedule_jpa.dto.schedule.request;
 
 import lombok.Getter;
 
