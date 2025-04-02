@@ -1,6 +1,6 @@
 package com.example.schedule_jpa.controller;
 
-import com.example.schedule_jpa.dto.user.SaveUserRequestDto;
+import com.example.schedule_jpa.dto.user.SignupRequestDto;
 import com.example.schedule_jpa.dto.user.UpdateUserRequestDto;
 import com.example.schedule_jpa.dto.user.UserResponseDto;
 import com.example.schedule_jpa.service.UserService;
@@ -22,7 +22,7 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<UserResponseDto> saveUser(
-            @Valid @RequestBody SaveUserRequestDto requestDto
+            @Valid @RequestBody SignupRequestDto requestDto
     ) {
         log.info("생성 api");
         UserResponseDto saveUser = userService.saveUser(requestDto);
