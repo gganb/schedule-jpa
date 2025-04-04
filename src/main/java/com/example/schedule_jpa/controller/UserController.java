@@ -1,8 +1,8 @@
 package com.example.schedule_jpa.controller;
 
-import com.example.schedule_jpa.dto.user.SignupRequestDto;
-import com.example.schedule_jpa.dto.user.UpdateUserRequestDto;
-import com.example.schedule_jpa.dto.user.UserResponseDto;
+import com.example.schedule_jpa.dto.user.request.SignupRequestDto;
+import com.example.schedule_jpa.dto.user.request.UpdateUserRequestDto;
+import com.example.schedule_jpa.dto.user.response.UserResponseDto;
 import com.example.schedule_jpa.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class UserController {
     public ResponseEntity<UserResponseDto> saveUser(
             @Valid @RequestBody SignupRequestDto requestDto
     ) {
-        log.info("생성 api");
+        log.info("user 생성 api");
         UserResponseDto saveUser = userService.saveUser(requestDto);
         return new ResponseEntity<>(saveUser, HttpStatus.OK);
     }
@@ -32,7 +32,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserResponseDto>> findAllUser() {
         List<UserResponseDto> userList = userService.findAllUser();
-        log.info("전체조회 api");
+        log.info("user 전체조회 api");
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
 
@@ -41,7 +41,7 @@ public class UserController {
             @PathVariable Long id
     ) {
         UserResponseDto findUser = userService.findUserById(id);
-        log.info("조회 api");
+        log.info("user 조회 api");
         return new ResponseEntity<>(findUser, HttpStatus.OK);
     }
 
@@ -49,18 +49,18 @@ public class UserController {
     public ResponseEntity<UserResponseDto> updateUser(
             @PathVariable String username,
             @RequestBody UpdateUserRequestDto requestDto
-            ){
-        log.info("수정 api");
-        UserResponseDto updateUser = userService.updateUser(username,requestDto);
-        return new ResponseEntity<>(updateUser,HttpStatus.OK);
+    ) {
+        log.info("user 수정 api");
+        UserResponseDto updateUser = userService.updateUser(username, requestDto);
+        return new ResponseEntity<>(updateUser, HttpStatus.OK);
     }
 
     @DeleteMapping("/{username}")
     public ResponseEntity<String> deleteUser(
             @PathVariable String username
-    ){
-        log.info("삭제 api");
+    ) {
+        log.info("user 삭제 api");
         String msg = userService.deleteUser(username);
-        return new ResponseEntity<>(msg,HttpStatus.OK);
+        return new ResponseEntity<>(msg, HttpStatus.OK);
     }
 }
