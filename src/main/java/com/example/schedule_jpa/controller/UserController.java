@@ -55,12 +55,12 @@ public class UserController {
         return new ResponseEntity<>(updateUser, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{username}")
+    @DeleteMapping("/{userid}")
     public ResponseEntity<String> deleteUser(
-            @PathVariable String username
+            @PathVariable Long userid
     ) {
         log.info("user 삭제 api");
-        String msg = userService.deleteUser(username);
+        String msg = userService.deleteUser(userid);
         return new ResponseEntity<>(msg, HttpStatus.OK);
     }
 }
