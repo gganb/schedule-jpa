@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user")
