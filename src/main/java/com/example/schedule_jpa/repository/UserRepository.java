@@ -1,10 +1,10 @@
 package com.example.schedule_jpa.repository;
 
 import com.example.schedule_jpa.entity.User;
+import com.example.schedule_jpa.exception.CustomException;
+import com.example.schedule_jpa.exception.ErrorCode;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -14,14 +14,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     default User findUserByUsernameOrElseThrow(String username) {
         return findUserByUsername(username).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "유저 이름이 존재하지 않습니다")
-        );
+                () ->  new CustomException(ErrorCode.USER_NOT_FOUND));
+
     }
 
     default User findUserByIdOrElseThrow(Long id){
         return findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,"id에 해당하는 유저 정보가 없습니다.")
-        );
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
+
+    boolean existsByEmail(String email);
 }
