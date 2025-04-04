@@ -32,6 +32,11 @@ public class Schedule extends BaseEntity {
         this.contents = contents;
     }
 
+    /**
+     * 일정 수정 메서드
+     * @param title
+     * @param contents
+     */
     public void update(String title, String contents) {
         if (title != null)
             this.title = title;
