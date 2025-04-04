@@ -6,19 +6,16 @@ import com.example.schedule_jpa.dto.schedule.request.ScheduleSaveRequestDto;
 import com.example.schedule_jpa.dto.schedule.response.ScheduleSaveResponseDto;
 import com.example.schedule_jpa.entity.Schedule;
 import com.example.schedule_jpa.entity.User;
+import com.example.schedule_jpa.exception.CustomException;
+import com.example.schedule_jpa.exception.ErrorCode;
 import com.example.schedule_jpa.repository.ScheduleRepository;
 import com.example.schedule_jpa.repository.UserRepository;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -61,7 +58,7 @@ public class ScheduleService {
 
         List<Schedule> scheduleList = scheduleRepository.findAll();
         if (scheduleList.isEmpty()) {
-            throw new NoSuchElementException("일정이 존재하지 않습니다");
+            throw new CustomException(ErrorCode.SCHEDULE_NOT_FOUND);
         }
         return scheduleList.stream().map(schedule -> new ScheduleResponseDto(
                 schedule.getId(),
@@ -77,8 +74,8 @@ public class ScheduleService {
     public ScheduleResponseDto updateSchedule(Long id, ScheduleUpdateRequestDto requestDto) {
         Schedule findschedule = scheduleRepository.findByIdOrElseThrow(id);
 
-        if(requestDto.getTitle() == null && requestDto.getContents() == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"수정할 내용이 없습니다.");
+        if (requestDto.getTitle() == null && requestDto.getContents() == null) {
+            throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
         }
         findschedule.update(requestDto.getTitle(), requestDto.getContents());
 
@@ -102,7 +99,7 @@ public class ScheduleService {
 
         List<Schedule> findList = scheduleRepository.findByUserIdOrderByUpdatedAtDesc(userid);
         if (findList.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "작성자의 일정이 존재하지 않습니다.");
+            throw new CustomException(ErrorCode.SCHEDULE_NOT_FOUND);
         }
         return findList.stream()
                 .map(schedule -> new ScheduleResponseDto(
@@ -113,17 +110,6 @@ public class ScheduleService {
                         schedule.getCreatedAt(),
                         schedule.getUpdatedAt()
                 )).toList();
-//        return scheduleRepository.findAll().stream()
-//                .filter(s -> findUserName.equals(s.getUser().getUsername()))
-//                .map(s -> new ScheduleResponseDto(
-//                        s.getId(),
-//                        s.getUser().getUsername(),
-//                        s.getTitle(),
-//                        s.getContents(),
-//                        s.getCreatedAt(),
-//                        s.getUpdatedAt()
-//                )).toList();
-        // user가 가진
 
 
     }
