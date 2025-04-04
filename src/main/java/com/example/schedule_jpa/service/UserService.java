@@ -1,17 +1,18 @@
 package com.example.schedule_jpa.service;
 
 
-import com.example.schedule_jpa.dto.user.SignupRequestDto;
-import com.example.schedule_jpa.dto.user.UpdateUserRequestDto;
-import com.example.schedule_jpa.dto.user.UserResponseDto;
+import com.example.schedule_jpa.dto.user.request.SignupRequestDto;
+import com.example.schedule_jpa.dto.user.request.UpdateUserRequestDto;
+import com.example.schedule_jpa.dto.user.response.UserResponseDto;
 import com.example.schedule_jpa.entity.User;
+import com.example.schedule_jpa.exception.CustomException;
+import com.example.schedule_jpa.exception.ErrorCode;
 import com.example.schedule_jpa.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -19,8 +20,16 @@ public class UserService {
     private final UserRepository userRepository;
 
     public UserResponseDto saveUser(SignupRequestDto requestDto) {
+        // 이메일 중복 검사
+        if (userRepository.existsByEmail(requestDto.getEmail())) {
+            throw new CustomException(ErrorCode.DUPLICATED_EMAIL);
+        }
+
+
         User user = new User(requestDto.getUsername(), requestDto.getEmail(), requestDto.getPassword());
+
         User savedUser = userRepository.save(user);
+
         return new UserResponseDto(
                 savedUser.getId(),
                 savedUser.getUsername(),
@@ -32,9 +41,11 @@ public class UserService {
 
     public List<UserResponseDto> findAllUser() {
         List<User> findUserList = userRepository.findAll();
+
         if (findUserList.isEmpty()) {
-            throw new NoSuchElementException("유저 정보가 없습니다");
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
+
         return findUserList.stream()
                 .map(user -> new UserResponseDto(
                         user.getId(),
@@ -48,6 +59,7 @@ public class UserService {
 
     public UserResponseDto findUserById(Long id) {
         User findUser = userRepository.findUserByIdOrElseThrow(id);
+
         return new UserResponseDto(
                 findUser.getId(),
                 findUser.getUsername(),
@@ -59,6 +71,7 @@ public class UserService {
     @Transactional
     public UserResponseDto updateUser(String username, UpdateUserRequestDto requestDto) {
         User findUser = userRepository.findUserByUsernameOrElseThrow(username);
+
         findUser.update(requestDto.getUsername(), requestDto.getEmail());
 
         return new UserResponseDto(
@@ -71,6 +84,7 @@ public class UserService {
 
     public String deleteUser(String username) {
         User findUser = userRepository.findUserByUsernameOrElseThrow(username);
+
         userRepository.delete(findUser);
 
         return "삭제되었습니다";
