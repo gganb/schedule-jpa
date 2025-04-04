@@ -1,4 +1,4 @@
-package com.example.schedule_jpa.dto.user;
+package com.example.schedule_jpa.dto.user.response;
 
 
 import lombok.Getter;
