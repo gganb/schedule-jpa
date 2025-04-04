@@ -1,6 +1,7 @@
 package com.example.schedule_jpa.service;
 
 
+import com.example.schedule_jpa.dto.user.request.LoginRequestDto;
 import com.example.schedule_jpa.dto.user.request.SignupRequestDto;
 import com.example.schedule_jpa.dto.user.request.UpdateUserRequestDto;
 import com.example.schedule_jpa.dto.user.response.UserResponseDto;
@@ -8,6 +9,7 @@ import com.example.schedule_jpa.entity.User;
 import com.example.schedule_jpa.exception.CustomException;
 import com.example.schedule_jpa.exception.ErrorCode;
 import com.example.schedule_jpa.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +26,6 @@ public class UserService {
         if (userRepository.existsByEmail(requestDto.getEmail())) {
             throw new CustomException(ErrorCode.DUPLICATED_EMAIL);
         }
-
 
         User user = new User(requestDto.getUsername(), requestDto.getEmail(), requestDto.getPassword());
 
@@ -82,11 +83,25 @@ public class UserService {
                 findUser.getUpdatedAt());
     }
 
-    public String deleteUser(String username) {
-        User findUser = userRepository.findUserByUsernameOrElseThrow(username);
+    @Transactional
+    public String deleteUser(Long userid) {
+        User findUser = userRepository.findUserByIdOrElseThrow(userid);
 
         userRepository.delete(findUser);
 
         return "삭제되었습니다";
+    }
+
+    // 회원 정보 확인 로직
+    @Transactional(readOnly = true)
+    public Long handleLogin(@Valid LoginRequestDto dto) {
+        User user = userRepository.findByEmail(dto.getEmail()).orElseThrow(
+                () -> new CustomException(ErrorCode.EMAIL_NOT_FOUND)
+        );
+        if (!user.getPassword().equals(dto.getPassword())) {
+            throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
+        }
+        return user.getId();
+
     }
 }
